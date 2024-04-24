@@ -1,0 +1,69 @@
+name: Build & Deploy
+
+on:
+ push:
+    branches:
+      - main
+
+env:
+  CI: false
+
+jobs:
+   build: 
+     name: Build
+     runs-on: ububtu-latest
+
+   steps:
+     - name: Checkout repo
+       uses: actions/chekout@v2
+
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
+          
+    - name: Install dependencies
+      uses: bahmutov/npm-install@v1
+
+    - name: Build Project
+      run: npm run build
+
+    - name: Upload Production-ready build files
+      uses: actions/upload-artiface@v2
+      with:
+        name: production-files
+        path: ./build
+
+deploy: 
+   name: Deploy
+   needs: build
+   runs-on: ubantu-latest
+   if: github.ref == 'refs/heads/main'
+
+   steps:
+     - name: Download artifact
+       uses: actions/download-artifacev@2
+         with:
+          name: productions-files
+          path: ./build
+
+     - name: Deploy to Github pages
+       uses: peaceries/actions-gh-pages@v3
+       with:
+         github_token: ${{ secrets.TOKEN }}
+         publish_dir: ./build
+          
+
+   
+   
+
+
+
+      
+      
+
+       
+   
+
+  
+  
